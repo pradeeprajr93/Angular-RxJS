@@ -21,7 +21,7 @@ export class ProductListComponent implements OnInit {
   constructor(private productService: ProductService) {}
 
   ngOnInit(): void {
-    this.products$ = this.productService.getProducts().pipe(
+    this.products$ = this.productService.products$.pipe(
       catchError((err) => {
         this.errorMessage = err;
         return EMPTY;
