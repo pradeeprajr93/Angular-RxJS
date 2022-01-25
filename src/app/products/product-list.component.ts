@@ -15,19 +15,18 @@ export class ProductListComponent implements OnInit {
   pageTitle = 'Product List';
   errorMessage = '';
   categories;
-
   products$: Observable<Product[]>;
 
-  constructor(private productService: ProductService) {}
-
-  ngOnInit(): void {
-    this.products$ = this.productService.products$.pipe(
+  ngOnInit() {
+    thisproducts$ = this.productService.getProducts().pipe(
       catchError((err) => {
         this.errorMessage = err;
         return EMPTY;
       })
     );
   }
+
+  constructor(private productService: ProductService) {}
 
   onAdd(): void {
     console.log('Not yet implemented');

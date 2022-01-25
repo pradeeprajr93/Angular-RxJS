@@ -12,18 +12,18 @@ import { SupplierService } from '../suppliers/supplier.service';
   providedIn: 'root',
 })
 export class ProductService {
-  private productsUrl = 'api/productss';
+  private productsUrl = 'api/products';
   constructor(
     private http: HttpClient,
     private supplierService: SupplierService
   ) {}
 
-  products$: Observable<Product[]> = this.http
-    .get<Product[]>(this.productsUrl)
-    .pipe(
+  getProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(this.productsUrl).pipe(
       tap((data) => console.log('Products: ', JSON.stringify(data))),
       catchError(this.handleError)
     );
+  }
 
   private fakeProduct(): Product {
     return {
