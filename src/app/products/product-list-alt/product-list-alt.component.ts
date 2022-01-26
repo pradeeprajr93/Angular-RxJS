@@ -1,33 +1,31 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import { EMPTY, Observable, Subscription } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
 
 @Component({
   selector: 'pm-product-list',
-  templateUrl: './product-list-alt.component.html'
+  templateUrl: './product-list-alt.component.html',
 })
-export class ProductListAltComponent implements OnInit, OnDestroy {
+export class ProductListAltComponent implements OnInit {
   pageTitle = 'Products';
   errorMessage = '';
   selectedProductId: number;
 
-  products: Product[] = [];
-  sub: Subscription;
+  products$: Observable<Product[]>;
 
-  constructor(private productService: ProductService) { }
+  constructor(private productService: ProductService) {}
 
   ngOnInit(): void {
-    this.sub = this.productService.getProducts().subscribe(
-      products => this.products = products,
-      error => this.errorMessage = error
+    this.products$ = this.productService.getProducts().pipe(
+      catchError((err) => {
+        this.errorMessage = err;
+        return EMPTY;
+      })
     );
-  }
-
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
   }
 
   onSelected(productId: number): void {
