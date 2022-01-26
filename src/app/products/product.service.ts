@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap, withLatestFrom } from 'rxjs/operators';
 
 import { Product } from './product';
 import { Supplier } from '../suppliers/supplier';
 import { SupplierService } from '../suppliers/supplier.service';
+import { ProductCategoryService } from '../product-categories/product-category.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,11 +16,30 @@ export class ProductService {
   private productsUrl = 'api/products';
   constructor(
     private http: HttpClient,
-    private supplierService: SupplierService
+    private supplierService: SupplierService,
+    private categoryService: ProductCategoryService
   ) {}
+
+  // getProducts(): Observable<Product[]> {
+  //   return this.http.get<Product[]>(this.productsUrl).pipe(
+  //     tap((data) => console.log('Products: ', JSON.stringify(data))),
+  //     catchError(this.handleError)
+  //   );
+  // }
 
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.productsUrl).pipe(
+      withLatestFrom(this.categoryService.getProductCategories()),
+      map(([products, categories]) =>
+        products.map(
+          (product) =>
+            ({
+              ...product,
+              category: categories.find((v) => v.id === product.categoryId)
+                .name,
+            } as Product)
+        )
+      ),
       tap((data) => console.log('Products: ', JSON.stringify(data))),
       catchError(this.handleError)
     );
