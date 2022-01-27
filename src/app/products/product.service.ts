@@ -2,7 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, merge, Observable, Subject, throwError } from 'rxjs';
-import { catchError, map, scan, tap, withLatestFrom } from 'rxjs/operators';
+import {
+  catchError,
+  map,
+  scan,
+  shareReplay,
+  tap,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 import { Product } from './product';
 import { Supplier } from '../suppliers/supplier';
@@ -51,6 +58,7 @@ export class ProductService {
             } as Product)
         )
       ),
+      tap(console.log),
       catchError(this.handleError)
     );
   }
@@ -76,7 +84,7 @@ export class ProductService {
       description: 'Our new product',
       price: 8.9,
       categoryId: 3,
-      // category: 'Toolbox',
+      category: 'Toolbox',
       quantityInStock: 30,
     };
   }

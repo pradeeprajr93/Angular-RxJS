@@ -53,7 +53,7 @@ export class ProductListComponent implements OnInit {
       })
     );
     this.productsWithCategories$ = combineLatest([
-      this.productService.getProducts(),
+      this.productService.getProductsWithAdditions(),
       this.categorySelectedAction$,
     ]).pipe(
       tap(console.log),

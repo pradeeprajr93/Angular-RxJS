@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { throwError, Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, shareReplay, tap } from 'rxjs/operators';
 
 import { ProductCategory } from './product-category';
 
@@ -15,9 +15,11 @@ export class ProductCategoryService {
   constructor(private http: HttpClient) {}
 
   getProductCategories() {
-    return this.http
-      .get<ProductCategory[]>(this.productCategoriesUrl)
-      .pipe(catchError(this.handleError));
+    return this.http.get<ProductCategory[]>(this.productCategoriesUrl).pipe(
+      tap((data) => console.log('categories', JSON.stringify(data))),
+      shareReplay(1),
+      catchError(this.handleError)
+    );
   }
 
   private handleError(err: any): Observable<never> {
