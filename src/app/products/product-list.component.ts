@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import {
   BehaviorSubject,
@@ -78,7 +78,7 @@ export class ProductListComponent implements OnInit {
   ) {}
 
   onAdd(): void {
-    console.log('Not yet implemented');
+    this.productService.addNewProduct();
   }
 
   onSelected(categoryId: string): void {

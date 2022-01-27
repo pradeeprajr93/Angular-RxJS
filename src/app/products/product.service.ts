@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable, throwError } from 'rxjs';
-import { catchError, map, tap, withLatestFrom } from 'rxjs/operators';
+import { BehaviorSubject, merge, Observable, Subject, throwError } from 'rxjs';
+import { catchError, map, scan, tap, withLatestFrom } from 'rxjs/operators';
 
 import { Product } from './product';
 import { Supplier } from '../suppliers/supplier';
@@ -14,18 +14,29 @@ import { ProductCategoryService } from '../product-categories/product-category.s
 })
 export class ProductService {
   private productsUrl = 'api/products';
+
+  private productSelectionSubject = new BehaviorSubject<number>(1);
+  productSelectAction$ = this.productSelectionSubject.asObservable();
+
+  private productAdditionSubject = new Subject<Product>();
+  productAddAction$ = this.productAdditionSubject.asObservable();
+
   constructor(
     private http: HttpClient,
     private supplierService: SupplierService,
     private categoryService: ProductCategoryService
   ) {}
 
-  // getProducts(): Observable<Product[]> {
-  //   return this.http.get<Product[]>(this.productsUrl).pipe(
-  //     tap((data) => console.log('Products: ', JSON.stringify(data))),
-  //     catchError(this.handleError)
-  //   );
-  // }
+  selectProduct(id: number) {
+    this.productSelectionSubject.next(id);
+  }
+
+  addNewProduct(product?: Product) {
+    if (!product) {
+      product = this.fakeProduct();
+    }
+    this.productAdditionSubject.next(product);
+  }
 
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.productsUrl).pipe(
@@ -40,8 +51,20 @@ export class ProductService {
             } as Product)
         )
       ),
-      tap((data) => console.log('Products: ', JSON.stringify(data))),
       catchError(this.handleError)
+    );
+  }
+
+  getProductsWithAdditions() {
+    return merge(this.getProducts(), this.productAddAction$).pipe(
+      scan((acc: Product[], value: Product) => [...acc, value])
+    );
+  }
+
+  getProduct(): Observable<Product> {
+    return this.productSelectAction$.pipe(
+      withLatestFrom(this.getProducts()),
+      map(([id, products]) => products.find((product) => product.id === +id))
     );
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { EMPTY, Observable, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -9,6 +9,7 @@ import { ProductService } from '../product.service';
 @Component({
   selector: 'pm-product-list',
   templateUrl: './product-list-alt.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductListAltComponent implements OnInit {
   pageTitle = 'Products';
@@ -16,6 +17,7 @@ export class ProductListAltComponent implements OnInit {
   selectedProductId: number;
 
   products$: Observable<Product[]>;
+  product$: Observable<Product>;
 
   constructor(private productService: ProductService) {}
 
@@ -26,9 +28,14 @@ export class ProductListAltComponent implements OnInit {
         return EMPTY;
       })
     );
+    this.product$ = this.productService.getProduct().pipe(
+      catchError((err) => {
+        return EMPTY;
+      })
+    );
   }
 
   onSelected(productId: number): void {
-    console.log('Not yet implemented');
+    this.productService.selectProduct(productId);
   }
 }
