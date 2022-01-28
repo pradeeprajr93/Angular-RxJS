@@ -58,14 +58,14 @@ export class ProductService {
             } as Product)
         )
       ),
-      tap(console.log),
+      // tap(console.log),
       catchError(this.handleError)
     );
   }
 
   getProductsWithAdditions() {
     return merge(this.getProducts(), this.productAddAction$).pipe(
-      scan((acc: Product[], value: Product) => [...acc, value])
+      scan((acc, value) => [...acc, value])
     );
   }
 

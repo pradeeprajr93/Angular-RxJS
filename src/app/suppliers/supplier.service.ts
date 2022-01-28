@@ -1,15 +1,39 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { throwError, Observable } from 'rxjs';
+import { throwError, Observable, of } from 'rxjs';
+import { concatMap, map, mergeMap, tap } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SupplierService {
   suppliersUrl = 'api/suppliers';
+  suplliersWithMap$;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    // console.log('suppliers log');
+    // this.subFn().subscribe((o) => o.subscribe(console.log));
+    this.subFnMergemap().subscribe(console.log);
+  }
+
+  subFn() {
+    return (this.suplliersWithMap$ = of(1, 2, 3).pipe(
+      map((input) => this.http.get(`${this.suppliersUrl}/${input})`))
+    ));
+  }
+
+  subFnConcatmap() {
+    return (this.suplliersWithMap$ = of(1, 2, 3).pipe(
+      concatMap((input) => this.http.get(`${this.suppliersUrl}/${input})`))
+    ));
+  }
+
+  subFnMergemap() {
+    return (this.suplliersWithMap$ = of(1, 2, 3).pipe(
+      mergeMap((input) => this.http.get(`${this.suppliersUrl}/${input})`))
+    ));
+  }
 
   private handleError(err: any): Observable<never> {
     // in a real world app, we may send the server to some remote logging infrastructure
@@ -26,5 +50,4 @@ export class SupplierService {
     console.error(err);
     return throwError(errorMessage);
   }
-
 }

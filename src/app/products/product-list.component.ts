@@ -56,7 +56,7 @@ export class ProductListComponent implements OnInit {
       this.productService.getProductsWithAdditions(),
       this.categorySelectedAction$,
     ]).pipe(
-      tap(console.log),
+      // tap(console.log),
       map(([p, a]) => p.filter((p) => (a ? p.categoryId === a : true)))
     );
     // this.productsWithCategories$ = this.productService.getProducts().pipe(
